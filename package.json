@@ -1,0 +1,31 @@
+{
+  "name": "vue3-ts-template-ljx",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "axios": "^0.20.0",
+    "vant": "^3.0.0-beta.3",
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0-0",
+    "vuex": "^4.0.0-0"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-router": "~4.5.0",
+    "@vue/cli-plugin-typescript": "~4.5.0",
+    "@vue/cli-plugin-vuex": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.0",
+    "compression-webpack-plugin": "^6.0.3",
+    "image-webpack-loader": "^7.0.1",
+    "less": "^3.0.4",
+    "less-loader": "^5.0.0",
+    "postcss-pxtorem": "^5.1.1",
+    "qs": "^6.9.4",
+    "typescript": "~3.9.3",
+    "uglifyjs-webpack-plugin": "^2.2.0"
+  }
+}
