@@ -46,9 +46,9 @@ function useContentData(store: Store<IGlobalState>) {
   let accessControlList = computed(() => store.state.home.accessControlList)
   onMounted(() => {
     if (cityList.value.length === 0) store.dispatch(`home/${Types.GET_CITY_LIST}`)
-    if (accessControlList.value.length === 0) store.dispatch(`home/${Types.GET_ACCESS_CONTROL_LIST}`, qs.stringify({ 
+    if (accessControlList.value.length === 0) store.dispatch(`home/${Types.GET_ACCESS_CONTROL_LIST}`, { 
       communityId: 13
-    }))
+    })
   })
   return {
     cityList,

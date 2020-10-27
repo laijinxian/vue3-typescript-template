@@ -42,6 +42,7 @@
   import { IGlobalState } from "@/store";
   import * as Types from "@/store/modules/Login/types";
   import { Toast } from 'vant'
+  import router from '@/router'
   export default defineComponent({
     name: 'login',
     isRouter: true,
@@ -65,6 +66,10 @@
         })
         store.dispatch(`login/${Types.GET_SMS_CODE}`, state.phone).then(res => {
           if (res.code !== 0) return
+          Toast({
+            message: '验证码已发送至您手机， 请查收',
+            duration: 2000
+          })
           state.isSend = true
           const timer = setInterval(() => {
             state.second--;
@@ -84,6 +89,7 @@
           if (res.code !== 0) return
           localStorage.setItem('h5_sessionId', res.data.sessionId)
           store.commit(`login/${Types.SAVE_USER_INFO}`, res.data)
+          router.push('/index')
         })
       }
       return {

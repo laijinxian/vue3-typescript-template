@@ -1,8 +1,8 @@
 import { Module } from 'vuex'
-import { IGlobalState } from '../../index'
+import { IGlobalState, IAxiosResponseData } from '../../index'
 import { IIndexState, IUserInfo } from './interface'
-import axios from 'axios'
-import * as Types from "./types";
+import * as Types from "./types"
+import * as API from './api'
 
 const state: IIndexState = {
   phone: '',
@@ -18,10 +18,10 @@ const login: Module<IIndexState, IGlobalState> = {
   state,
   actions: {
     async [Types.GET_SMS_CODE]({ state }) {
-      return axios.post(`ccb/sendSms?phone=${state.phone}&resource=1`)
+      return API.getSmsCode<IAxiosResponseData>(state.phone)
     },
-    async [Types.ON_LOGIN]({ commit, state }) {
-      return axios.post(`ccb/register?phone=${state.phone}&smsCode=${state.sms}`)
+    async [Types.ON_LOGIN]({ state }) {
+      return API.onLogin<IAxiosResponseData>(state.phone, state.sms)
     }
   },
   mutations: {
@@ -33,7 +33,6 @@ const login: Module<IIndexState, IGlobalState> = {
     },
     [Types.SAVE_USER_INFO](state, info: IUserInfo) {
       state.userInfo = info
-      console.log(info)
     }
   }
 }

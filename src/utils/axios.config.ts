@@ -49,7 +49,7 @@ export const axionInit = () => {
         return data
       }
     } else {
-      return response
+      return data
     }
   }, error => {
     const { response } = error

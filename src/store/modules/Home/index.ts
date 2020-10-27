@@ -1,11 +1,12 @@
 import { Module } from 'vuex'
-import { IGlobalState } from '../../index'
+import { IGlobalState, IAxiosResponseData } from '../../index'
 import * as Types from './types'
 import { IHomeState, ICity, IAccessControl, ICommonlyUsedDoor } from './interface'
-import axios from 'axios'
+import * as API from './api'
 
 const state: IHomeState = {
   cityList: [],
+  communityId: 13,
   commonlyUsedDoor: {
     doorControlId: '',
     doorControlName: ''
@@ -19,13 +20,16 @@ const home: Module<IHomeState, IGlobalState> = {
   actions: {
     // 获取小区列表
     async [Types.GET_CITY_LIST]({ commit }) {
-      const result = await axios.post(`auth/v2/getApplyListGroupByCommunityH5?`)
+      const result = await API.getCityList<IAxiosResponseData>()
+      if (result.code !== 0) return
       commit(Types.GET_CITY_LIST, result.data)
     },
     // 获取小区门禁列表
-    async [Types.GET_ACCESS_CONTROL_LIST]({ commit }, data) {
-      console.log(data)
-      const result = await axios.post(`doorcontrol/v2/queryUserDoor?`, data)
+    async [Types.GET_ACCESS_CONTROL_LIST]({ commit }) {
+      const result = await API.getCityAccessControlList<IAxiosResponseData>({
+        communityId: state.communityId
+      })
+      if (result.code !== 0) return
       commit(Types.GET_ACCESS_CONTROL_LIST, result.data.userDoorDTOS)
       commit(Types.SET_COMMONLY_USERDOOR, result.data.commonlyUsedDoor)
     },

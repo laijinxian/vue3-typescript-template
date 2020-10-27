@@ -10,6 +10,13 @@ export interface IGlobalState {
   Login: IIndexState
 }
 
+// 后台接口返回参数类
+export interface IAxiosResponseData {
+  code: number,
+  data: any,
+  message: string
+}
+
 const store = createStore<IGlobalState>({
   mutations: {
   },

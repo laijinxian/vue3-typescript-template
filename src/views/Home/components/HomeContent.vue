@@ -46,7 +46,6 @@ import { useStore } from "vuex";
 import { IGlobalState } from "@/store";
 import * as Types from "@/store/modules/Home/types";
 import { IHomeState, ICity, IAccessControl } from '@/store/modules/Home/interface'
-import qs from 'qs';
 export default defineComponent({
   name: 'homeContent',
   isComponents: true,
@@ -86,9 +85,9 @@ export default defineComponent({
     }
     const selectCity = (city: ICity) => {
       state.show = false
-      store.dispatch(`home/${Types.GET_ACCESS_CONTROL_LIST}`, qs.stringify({ 
+      store.dispatch(`home/${Types.GET_ACCESS_CONTROL_LIST}`, { 
         communityId: city.communityId
-      }))
+      })
       currentCommunity.value.communityName = city.communityName
     }
     return {
