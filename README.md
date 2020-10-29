@@ -1,10 +1,12 @@
+原文： [本人github文章](https://github.com/laijinxian/vue3-typescript-template)
+
 关注公众号： 微信搜索 `web全栈进阶` ; 收货更多的干货
 
 ## 一、开篇
 - `vue3.0beta`版正式上线，作为新技术热爱者，新项目将正式使用`vue3.0`开发； 接下来总结（对自己技术掌握的稳固）介绍（分享有需要的猿友）
 - 上篇博客介绍了`vue3.0`常用语法及开发技巧；有需要的请点击 [Vue3.0 进阶、环境搭建、相关API的使用](https://juejin.im/post/6877832502590111757)
 - 觉得对您有用的 `github` 点个 `star` 呗
-- 项目github地址：
+- 项目`github`地址：`https://github.com/laijinxian/vue3-typescript-template`
 
 ##  二、项目介绍（移动端）
 - 1）技术栈： `vue3 + vuex + typescript + webpack + vant-ui + axios + less + postcss-pxtorem(rem适配)`
@@ -20,7 +22,7 @@
 1. `vue-cli、vue` 下载最新版本
 2. 执行命令 `vue create my_app_name`
 3. 执行完上面命令接下来选择手动配置（第三个），不要选择默认配置，有很多我们用不上，我的选择如下图：
-![](https://imgkr2.cn-bj.ufileos.com/2fc4ce04-aceb-4ac6-8f70-1b5d40fca806.jpg?UCloudPublicKey=TOKEN_8d8b72be-579a-4e83-bfd0-5f6ce1546f13&Signature=%252F8g2wk69CINkwmTa62rKIUjSLCk%253D&Expires=1603787843)
+![](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/de9c45a9a40543df9c7240c62b747c27~tplv-k3u1fbpfcp-watermark.image)
 
 ## 三、项目主要功能
 **1. `webpack require` 自动化注册路由、自动化注册异步组价**
@@ -31,6 +33,7 @@
 
 import { defineAsyncComponent } from 'vue'
 import { app } from '../main'
+import { IRouter } from './interface'
 
 // 获取所有vue文件
 function getComponent() {
@@ -38,16 +41,16 @@ function getComponent() {
 }
 
 // 首字母转换大写
-function letterToUpperCase(str: string) {
+function letterToUpperCase(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 // 首字母转换小写
-function letterToLowerCase(str: string) {
+function letterToLowerCase(str: string): string {
   return str.charAt(0).toLowerCase() + str.slice(1);
 }
 
-export const asyncComponent = function () {
+export const asyncComponent = (): void => {
 
   // 获取文件全局对象
   const requireComponents = getComponent();
@@ -69,14 +72,13 @@ export const asyncComponent = function () {
       
       app.component(letterToUpperCase(file.name), componentRoot)
     }
-    
   });
 };
 
 // 获取路由文件
-export const vueRouters = function () {
+export const vueRouters = (): IRouter[] => {
 
-  const routerList: any = [];
+  const routerList: IRouter[] = [];
 
   const requireRouters = getComponent();
 
@@ -84,6 +86,7 @@ export const vueRouters = function () {
 
     // 获取 components 文件下的文件名
     const viewSrc = requireRouters(fileSrc);
+
     const file = viewSrc.default;
 
     // 首字母转大写
@@ -92,7 +95,6 @@ export const vueRouters = function () {
     // 首字母转小写
     const routerPath = letterToLowerCase(file.name);
 
-    // 设置路由路径
     const fileNameSrc = fileSrc.replace(/^\.\//, '');
 
     if (file.isRouter) {
@@ -159,7 +161,7 @@ export const axionInit = () => {
         return data
       }
     } else {
-      return response
+      return data
     }
   }, error => {
     const { response } = error
@@ -184,13 +186,15 @@ export const axionInit = () => {
 ```
 // 具体请看项目store目录
 import { Module } from 'vuex'
-import { IGlobalState } from '../../index'
+import { IGlobalState, IAxiosResponseData } from '../../index'
 import * as Types from './types'
-import { IHomeState, ICity, IAccessControl, ICommonlyUsedDoor } from './interface'
-import axios from 'axios'
+import { IHomeState, ICity, IAccessControl, ICommonlyUsedDoor, AGetCtiy } from './interface'
+import qs from 'qs';
+import * as API from './api'
 
 const state: IHomeState = {
   cityList: [],
+  communityId: 13,
   commonlyUsedDoor: {
     doorControlId: '',
     doorControlName: ''
@@ -204,12 +208,16 @@ const home: Module<IHomeState, IGlobalState> = {
   actions: {
     // 获取小区列表
     async [Types.GET_CITY_LIST]({ commit }) {
-      const result = await axios.post(`auth/v2/getApplyListGroupByCommunityH5?`)
+      const result = await API.getCityList<IAxiosResponseData>()
+      if (result.code !== 0) return
       commit(Types.GET_CITY_LIST, result.data)
     },
     // 获取小区门禁列表
-    async [Types.GET_ACCESS_CONTROL_LIST]({ commit }, data) {
-      const result = await axios.post(`doorcontrol/v2/queryUserDoor?`, { ...data })
+    async [Types.GET_ACCESS_CONTROL_LIST]({ commit }) {
+      const result = await API.getCityAccessControlList<IAxiosResponseData>({
+        communityId: state.communityId
+      })
+      if (result.code !== 0) return
       commit(Types.GET_ACCESS_CONTROL_LIST, result.data.userDoorDTOS)
       commit(Types.SET_COMMONLY_USERDOOR, result.data.commonlyUsedDoor)
     },
@@ -266,6 +274,7 @@ import { defineComponent, reactive, toRefs, computed, onMounted } from 'vue'
 import { Store, useStore } from 'vuex'
 import { IGlobalState } from "@/store";
 import * as Types from "@/store/modules/Home/types";
+import qs from 'qs';
 
 /**
  * 该hook目的：个人理解：
@@ -280,7 +289,9 @@ function useContentData(store: Store<IGlobalState>) {
   let accessControlList = computed(() => store.state.home.accessControlList)
   onMounted(() => {
     if (cityList.value.length === 0) store.dispatch(`home/${Types.GET_CITY_LIST}`)
-    if (accessControlList.value.length === 0) store.dispatch(`home/${Types.GET_ACCESS_CONTROL_LIST}`, 13)
+    if (accessControlList.value.length === 0) store.dispatch(`home/${Types.GET_ACCESS_CONTROL_LIST}`, { 
+      communityId: 13
+    })
   })
   return {
     cityList,
@@ -325,9 +336,127 @@ export default defineComponent({
 }
 </style>
 ```
+**5. `login` 文件代码**
+```
+<template>
+  <div class="login-container">
+    <p>手机号登录</p>
+    <van-cell-group>
+      <van-field
+        v-model="phone"
+        required
+        clearable
+        maxlength="11"
+        label="手机号"
+        placeholder="请输入手机号" />
+      <van-field
+        v-model="sms"
+        center
+        required
+        clearable
+        maxlength="6"
+        label="短信验证码"
+        placeholder="请输入短信验证码">
+        <template #button>
+          <van-button
+            size="small"
+            plain
+            @click="getSmsCode">{{isSend ? `${second} s` : '发送验证码'}}</van-button>
+        </template>
+      </van-field>
+    </van-cell-group>
+    <div class="login-button">
+      <van-button
+        :loading="isLoading"
+        size="large"
+        @click="onLogin"
+        loading-text="正在登录..."
+        type="primary">登录</van-button>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+  import { defineComponent, reactive, toRefs } from 'vue'
+  import { useStore } from "vuex";
+  import { IGlobalState } from "@/store";
+  import * as Types from "@/store/modules/Login/types";
+  import { Toast } from 'vant'
+  import router from '@/router'
+  export default defineComponent({
+    name: 'login',
+    isRouter: true,
+    setup(props, ctx) {
+      let store = useStore <IGlobalState> ()
+      const state = reactive({
+        sms: '',
+        phone: '',
+        second: 60,
+        isSend: false,
+        isLoading: false
+      })
+      const phoneRegEx = /^[1][3,4,5,6,7,8,9][0-9]{9}$/
+      // 获取验证码
+      const getSmsCode = async () => {
+        localStorage.removeItem('h5_sessionId')
+        store.commit(`login/${Types.SAVE_PHONE}`, state.phone)
+        if (!phoneRegEx.test(state.phone)) return Toast({
+          message: '手机号输入有误！',
+          duration: 2000
+        })
+        store.dispatch(`login/${Types.GET_SMS_CODE}`, state.phone).then(res => {
+          if (res.code !== 0) return
+          Toast({
+            message: '验证码已发送至您手机， 请查收',
+            duration: 2000
+          })
+          state.isSend = true
+          const timer = setInterval(() => {
+            state.second--;
+            if (state.second <= 0) {
+              state.isSend = false
+              clearInterval(timer);
+            }
+          }, 1000);
+        })
+      }
+      // 登录
+      const onLogin = () => {
+        state.isLoading = true
+        store.commit(`login/${Types.SAVE_SMS_CODE}`, state.sms)
+        store.dispatch(`login/${Types.ON_LOGIN}`).then(res => {
+          state.isLoading = false
+          if (res.code !== 0) return
+          localStorage.setItem('h5_sessionId', res.data.sessionId)
+          store.commit(`login/${Types.SAVE_USER_INFO}`, res.data)
+          router.push('/index')
+        })
+      }
+      return {
+        ...toRefs(state),
+        onLogin,
+        getSmsCode
+      }
+    }
+  })
+</script>
+
+<style lang="less" scoped>
+  .login-container {
+    padding: 0 20px;
+    >p {
+      padding: 50px 20px 40px;
+      font-size: 40px;
+    }
+    .login-button {
+      margin-top: 50px;
+    }
+  }
+</style>
+```
 ## 四、项目ui
-![](https://imgkr2.cn-bj.ufileos.com/9e203646-e937-4fc6-8602-6f07b28675f1.jpg?UCloudPublicKey=TOKEN_8d8b72be-579a-4e83-bfd0-5f6ce1546f13&Signature=hOlNR%252FrpzGeXFqIIQS%252FybcPqvjc%253D&Expires=1603791394)
-![](https://imgkr2.cn-bj.ufileos.com/6c90779e-486c-417c-a6ac-31dffae87019.jpg?UCloudPublicKey=TOKEN_8d8b72be-579a-4e83-bfd0-5f6ce1546f13&Signature=zW8rYy5udR5Z9V5l1aoa58j77zU%253D&Expires=1603791397)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4b24cd073cbe4d89a25fd14ef24cb678~tplv-k3u1fbpfcp-watermark.image)
+![](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6adf633bd1b94901b09f277c9aeec2f0~tplv-k3u1fbpfcp-watermark.image)
 
 ## 五、结语
 以上为个人实际项目开发总结， 有不对之处欢迎留言指正
