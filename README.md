@@ -1,4 +1,4 @@
-原文： [本人github文章](https://github.com/laijinxian/vue3-typescript-template)
+原文： [掘金文章](https://juejin.im/post/6887867687897301006)
 
 关注公众号： 微信搜索 `web全栈进阶` ; 收货更多的干货
 
