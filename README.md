@@ -22,7 +22,7 @@
 1. `vue-cli、vue` 下载最新版本
 2. 执行命令 `vue create my_app_name`
 3. 执行完上面命令接下来选择手动配置（第三个），不要选择默认配置，有很多我们用不上，我的选择如下图：
-![](https://imgkr2.cn-bj.ufileos.com/91d77467-7586-4f24-9294-77b855526912.jpg?UCloudPublicKey=TOKEN_8d8b72be-579a-4e83-bfd0-5f6ce1546f13&Signature=8KAtViJ7xnImPg5hBcIDKPhoR4Q%253D&Expires=1603876892)
+![](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/de9c45a9a40543df9c7240c62b747c27~tplv-k3u1fbpfcp-watermark.image)
 
 ## 三、项目主要功能
 **1. `webpack require` 自动化注册路由、自动化注册异步组价**
@@ -33,6 +33,7 @@
 
 import { defineAsyncComponent } from 'vue'
 import { app } from '../main'
+import { IRouter } from './interface'
 
 // 获取所有vue文件
 function getComponent() {
@@ -40,16 +41,16 @@ function getComponent() {
 }
 
 // 首字母转换大写
-function letterToUpperCase(str: string) {
+function letterToUpperCase(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 // 首字母转换小写
-function letterToLowerCase(str: string) {
+function letterToLowerCase(str: string): string {
   return str.charAt(0).toLowerCase() + str.slice(1);
 }
 
-export const asyncComponent = function () {
+export const asyncComponent = (): void => {
 
   // 获取文件全局对象
   const requireComponents = getComponent();
@@ -71,14 +72,13 @@ export const asyncComponent = function () {
       
       app.component(letterToUpperCase(file.name), componentRoot)
     }
-    
   });
 };
 
 // 获取路由文件
-export const vueRouters = function () {
+export const vueRouters = (): IRouter[] => {
 
-  const routerList: any = [];
+  const routerList: IRouter[] = [];
 
   const requireRouters = getComponent();
 
@@ -86,6 +86,7 @@ export const vueRouters = function () {
 
     // 获取 components 文件下的文件名
     const viewSrc = requireRouters(fileSrc);
+
     const file = viewSrc.default;
 
     // 首字母转大写
@@ -94,7 +95,6 @@ export const vueRouters = function () {
     // 首字母转小写
     const routerPath = letterToLowerCase(file.name);
 
-    // 设置路由路径
     const fileNameSrc = fileSrc.replace(/^\.\//, '');
 
     if (file.isRouter) {
@@ -455,8 +455,8 @@ export default defineComponent({
 </style>
 ```
 ## 四、项目ui
-![](https://imgkr2.cn-bj.ufileos.com/9e203646-e937-4fc6-8602-6f07b28675f1.jpg?UCloudPublicKey=TOKEN_8d8b72be-579a-4e83-bfd0-5f6ce1546f13&Signature=hOlNR%252FrpzGeXFqIIQS%252FybcPqvjc%253D&Expires=1603791394)
-![](https://imgkr2.cn-bj.ufileos.com/6c90779e-486c-417c-a6ac-31dffae87019.jpg?UCloudPublicKey=TOKEN_8d8b72be-579a-4e83-bfd0-5f6ce1546f13&Signature=zW8rYy5udR5Z9V5l1aoa58j77zU%253D&Expires=1603791397)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4b24cd073cbe4d89a25fd14ef24cb678~tplv-k3u1fbpfcp-watermark.image)
+![](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6adf633bd1b94901b09f277c9aeec2f0~tplv-k3u1fbpfcp-watermark.image)
 
 ## 五、结语
 以上为个人实际项目开发总结， 有不对之处欢迎留言指正
