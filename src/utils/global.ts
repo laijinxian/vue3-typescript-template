@@ -1,5 +1,6 @@
 import { defineAsyncComponent } from 'vue'
 import { app } from '../main'
+import { IRouter } from './interface'
 
 // 获取所有vue文件
 function getComponent() {
@@ -7,16 +8,16 @@ function getComponent() {
 }
 
 // 首字母转换大写
-function letterToUpperCase(str: string) {
+function letterToUpperCase(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 // 首字母转换小写
-function letterToLowerCase(str: string) {
+function letterToLowerCase(str: string): string {
   return str.charAt(0).toLowerCase() + str.slice(1);
 }
 
-export const asyncComponent = function () {
+export const asyncComponent = (): void => {
 
   // 获取文件全局对象
   const requireComponents = getComponent();
@@ -38,22 +39,13 @@ export const asyncComponent = function () {
       
       app.component(letterToUpperCase(file.name), componentRoot)
     }
-    
-    // 异步注册组件
-    // app.component(
-    //   componentName,
-    //   import(`@/views/${fileNameSrc}`)
-    //   // () => import(viewSrc.default || viewSrc)
-    //   // (resolve: any) => { require([`@/views/${fileNameSrc}`], resolve); }
-    //   // 
-    // )
   });
 };
 
 // 获取路由文件
-export const vueRouters = function () {
+export const vueRouters = (): IRouter[] => {
 
-  const routerList: any = [];
+  const routerList: IRouter[] = [];
 
   const requireRouters = getComponent();
 
@@ -63,17 +55,13 @@ export const vueRouters = function () {
     const viewSrc = requireRouters(fileSrc);
 
     const file = viewSrc.default;
-    // const view = fileSrc.split('/')[fileSrc.split('/').length - 1];
 
     // 首字母转大写
-    // const vueRouterUpper = letterToUpperCase(view.replace(/^\.\//, '').replace(/\.\w+$/, ''));
     const routerName = letterToUpperCase(file.name);
 
     // 首字母转小写
-    // const vueRouterLower = letterToLowerCase(view.replace(/^\.\//, '').replace(/\.\w+$/, ''));
     const routerPath = letterToLowerCase(file.name);
 
-    // 设置路由路径  (resolve: any) => { require([`@/views/${fileNameSrc}`], resolve); },
     const fileNameSrc = fileSrc.replace(/^\.\//, '');
 
     if (file.isRouter) {
