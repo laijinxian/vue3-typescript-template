@@ -20,6 +20,7 @@
               <p> <span>{{city.provinceName}}</span>  <span>{{city.districtName}}</span></p>
             </li>
           </ul>
+          <div class="apply-button"><van-button type="danger" size="small">申 请 权 限</van-button></div>
         </van-popup>
       </div>
       <div class="open-door">
@@ -77,15 +78,14 @@ export default defineComponent({
       }]
     })
     let commonlyUsedDoor = computed(() => store.state.home.commonlyUsedDoor)
-    let currentCommunity = ref({
-      communityName: ''
-    })
+    let currentCommunity = computed(() => store.state.home.currentCommunity)
+    console.log(currentCommunity.value)
     const showCityPopup = () => {
       state.show = true
     }
     const selectCity = (city: ICity) => {
       state.show = false
-      store.dispatch(`home/${Types.GET_ACCESS_CONTROL_LIST}`, { 
+      store.dispatch(`home/${Types.GET_ACCESS_CONTROL_LIST}`, {
         communityId: city.communityId
       })
       currentCommunity.value.communityName = city.communityName
@@ -158,6 +158,10 @@ export default defineComponent({
               font-size: 30px;
             }
           }
+        }
+        .apply-button{
+          text-align: center;
+          padding: 15px 0 10px;
         }
         /deep/ .van-cell{
           padding: 10px 15px;

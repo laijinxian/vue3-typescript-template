@@ -63,7 +63,7 @@ export const vueRouters = (): IRouter[] => {
     const routerPath = letterToLowerCase(file.name);
 
     const fileNameSrc = fileSrc.replace(/^\.\//, '');
-
+    
     if (file.isRouter) {
       routerList.push({
         path: `/${routerPath}`,

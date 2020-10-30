@@ -4,6 +4,13 @@
  * @ 接口参数类开头 A
  */
 
+export interface IHomeState {
+  cityList: ICity[],
+  currentCommunity: IcurrentCommunity,
+  commonlyUsedDoor: ICommonlyUsedDoor,
+  accessControlList: IAccessControl[]
+}
+
 export interface ICity {
   cityName: string,
   cityId: string,
@@ -18,11 +25,9 @@ export interface IAccessControl {
   doorControlName: string
 }
 
-export interface IHomeState {
-  cityList: ICity[],
-  communityId: string | number,
-  commonlyUsedDoor: ICommonlyUsedDoor,
-  accessControlList: IAccessControl[]
+export interface IcurrentCommunity{
+  communityId: string,
+  communityName: string
 }
 
 export interface ICommonlyUsedDoor{
@@ -30,6 +35,7 @@ export interface ICommonlyUsedDoor{
   doorControlName: string
 }
 
-export interface AGetCtiy{
-  communityId: string | number
+export interface AGetBuilding{
+  communityId: string | number,
+  userId: string | number
 }

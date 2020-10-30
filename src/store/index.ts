@@ -7,7 +7,7 @@ import login from './modules/Login'
 // 全局状态
 export interface IGlobalState {
   home: IHomeState,
-  Login: IIndexState
+  login: IIndexState
 }
 
 // 后台接口返回参数类

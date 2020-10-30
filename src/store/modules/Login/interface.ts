@@ -7,6 +7,7 @@ export interface IIndexState {
   export interface IUserInfo {
     communitylist: ICommunity[],
     sessionId: string,
+    userId: string | number
   }
   
   export interface ICommunity {
@@ -14,3 +15,12 @@ export interface IIndexState {
     cityCode: string
   }
   
+  export interface ALoginData {
+    appChannel: number,
+    mobile: string,
+    smsCode: string
+  }
+  
+  export interface ACodeData {
+    phone: string
+  }

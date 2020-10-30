@@ -1,10 +1,9 @@
 
 import axios from 'axios'
-import qs from 'qs'
-import { AGetCtiy } from './interface'
+import { AGetBuilding } from './interface'
 
 // 获取小区列表
-export const getCityList = <T>() => axios.post<T, T>(`auth/v2/getApplyListGroupByCommunityH5?`)
+export const getCityList = <T>(userId: string | number) => axios.post<T, T>(`app/user/communityInfo?userId=${userId}&`)
 
 // 获取小区门禁列表
-export const getCityAccessControlList = <T>(data: AGetCtiy) => axios.post<T, T>(`doorcontrol/v2/queryUserDoor?`, qs.stringify(data))
+export const getCityAccessControlList = <T>(data: AGetBuilding) => axios.post<T, T>(`app/user/queryUserDoorByCache?`, data)

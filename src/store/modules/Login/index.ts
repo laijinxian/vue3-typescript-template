@@ -5,9 +5,11 @@ import * as Types from "./types"
 import * as API from './api'
 
 const state: IIndexState = {
-  phone: '',
-  sms: '',
+  // 方便测试写死测试手机号验证码
+  phone: '13201010003',
+  sms: '116688',
   userInfo: {
+    userId: '',
     communitylist: [],
     sessionId: 'string',
   }
@@ -18,10 +20,16 @@ const login: Module<IIndexState, IGlobalState> = {
   state,
   actions: {
     async [Types.GET_SMS_CODE]({ state }) {
-      return API.getSmsCode<IAxiosResponseData>(state.phone)
+      return API.getSmsCode<IAxiosResponseData>({
+        phone: state.phone
+      })
     },
     async [Types.ON_LOGIN]({ state }) {
-      return API.onLogin<IAxiosResponseData>(state.phone, state.sms)
+      return API.onLogin<IAxiosResponseData>({
+        appChannel: 0,
+        mobile: state.phone,
+        smsCode: state.sms
+      })
     }
   },
   mutations: {
@@ -32,7 +40,9 @@ const login: Module<IIndexState, IGlobalState> = {
       state.sms = sms
     },
     [Types.SAVE_USER_INFO](state, info: IUserInfo) {
-      state.userInfo = info
+      state.userInfo.communitylist = info.communitylist
+      state.userInfo.sessionId = info.sessionId
+      state.userInfo.userId = info.userId
     }
   }
 }

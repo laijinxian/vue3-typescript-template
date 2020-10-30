@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, reactive, toRefs } from 'vue'
+  import { computed, defineComponent, reactive, toRefs } from 'vue'
   import { useStore } from "vuex";
   import { IGlobalState } from "@/store";
   import * as Types from "@/store/modules/Login/types";
@@ -47,10 +47,11 @@
     name: 'login',
     isRouter: true,
     setup(props, ctx) {
+      localStorage.removeItem('h5_sessionId')
       let store = useStore <IGlobalState> ()
       const state = reactive({
-        sms: '',
-        phone: '',
+        sms: computed(() => store.state.login.sms),
+        phone: computed(() => store.state.login.phone),
         second: 60,
         isSend: false,
         isLoading: false
@@ -58,7 +59,6 @@
       const phoneRegEx = /^[1][3,4,5,6,7,8,9][0-9]{9}$/
       // 获取验证码
       const getSmsCode = async () => {
-        localStorage.removeItem('h5_sessionId')
         store.commit(`login/${Types.SAVE_PHONE}`, state.phone)
         if (!phoneRegEx.test(state.phone)) return Toast({
           message: '手机号输入有误！',
@@ -82,6 +82,10 @@
       }
       // 登录
       const onLogin = () => {
+        if (!state.phone || !state.sms) return Toast({
+            message: '输入有误，请检查',
+            duration: 2000
+          })
         state.isLoading = true
         store.commit(`login/${Types.SAVE_SMS_CODE}`, state.sms)
         store.dispatch(`login/${Types.ON_LOGIN}`).then(res => {

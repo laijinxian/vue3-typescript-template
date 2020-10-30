@@ -20,7 +20,7 @@ export const axionInit = () => {
     })
 
     // 存在 sessionId 为所有请求加上 sessionId
-    if (localStorage.getItem(`h5_sessionId`) && config.url!.indexOf('/user/login') < 0) config.url += ('sessionId=' + localStorage.getItem(`h5_sessionId`))
+    if (localStorage.getItem(`h5_sessionId`) && config.url!.indexOf('/app/login') < 0) config.url += ('sessionId=' + localStorage.getItem(`h5_sessionId`))
     if (!config.data) config.data = {}
     return config
   }, function (error) {
@@ -44,7 +44,7 @@ export const axionInit = () => {
           message: data.message,
           duration: 2000
         })
-        return router.push('/login')
+        return router.push('/')
       } else {
         return data
       }
