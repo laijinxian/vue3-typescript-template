@@ -188,17 +188,18 @@ export const axionInit = () => {
 ```
 **3. `vuex` 业务模块化、 接管请求统一处理**
 ```
-// 具体请看项目store目录
 import { Module } from 'vuex'
 import { IGlobalState, IAxiosResponseData } from '../../index'
 import * as Types from './types'
-import { IHomeState, ICity, IAccessControl, ICommonlyUsedDoor, AGetCtiy } from './interface'
-import qs from 'qs';
+import { IHomeState, ICity, IAccessControl, ICommonlyUsedDoor, IcurrentCommunity } from './interface'
 import * as API from './api'
 
 const state: IHomeState = {
   cityList: [],
-  communityId: 13,
+  currentCommunity: {
+    communityId: '',
+    communityName: ''
+  },
   commonlyUsedDoor: {
     doorControlId: '',
     doorControlName: ''
@@ -211,15 +212,18 @@ const home: Module<IHomeState, IGlobalState> = {
   state,
   actions: {
     // 获取小区列表
-    async [Types.GET_CITY_LIST]({ commit }) {
-      const result = await API.getCityList<IAxiosResponseData>()
+    async [Types.GET_CITY_LIST]({ commit, rootState }) {
+      console.log(rootState.login.userInfo.userId)
+      const result = await API.getCityList<IAxiosResponseData>(rootState.login.userInfo.userId)
       if (result.code !== 0) return
       commit(Types.GET_CITY_LIST, result.data)
+      commit(Types.SET_CURRENT_COMMUNIRY, result.data[0])
     },
     // 获取小区门禁列表
-    async [Types.GET_ACCESS_CONTROL_LIST]({ commit }) {
+    async [Types.GET_ACCESS_CONTROL_LIST]({ commit, rootState }) {
       const result = await API.getCityAccessControlList<IAxiosResponseData>({
-        communityId: state.communityId
+        userId: rootState.login.userInfo.userId,
+        communityId: state.currentCommunity.communityId
       })
       if (result.code !== 0) return
       commit(Types.GET_ACCESS_CONTROL_LIST, result.data.userDoorDTOS)
@@ -236,11 +240,18 @@ const home: Module<IHomeState, IGlobalState> = {
       if (accessControlList.length !== 0) return state.accessControlList = accessControlList
     },
     // 设置当前小区
+    [Types.SET_CURRENT_COMMUNIRY](state, currentCommunity: IcurrentCommunity) {
+      state.currentCommunity.communityId = currentCommunity.communityId
+      state.currentCommunity.communityName = currentCommunity.communityName
+    },
+     // 设置常用小区
     [Types.SET_COMMONLY_USERDOOR](state, commonlyUsedDoor: ICommonlyUsedDoor) {
+      state.commonlyUsedDoor = commonlyUsedDoor
       state.commonlyUsedDoor = commonlyUsedDoor
     }
   }
 }
+
 export default home
 ```
 **4. `home` 文件代码**
@@ -381,7 +392,7 @@ export default defineComponent({
 </template>
 
 <script lang="ts">
-  import { defineComponent, reactive, toRefs } from 'vue'
+  import { computed, defineComponent, reactive, toRefs } from 'vue'
   import { useStore } from "vuex";
   import { IGlobalState } from "@/store";
   import * as Types from "@/store/modules/Login/types";
@@ -391,10 +402,11 @@ export default defineComponent({
     name: 'login',
     isRouter: true,
     setup(props, ctx) {
+      localStorage.removeItem('h5_sessionId')
       let store = useStore <IGlobalState> ()
       const state = reactive({
-        sms: '',
-        phone: '',
+        sms: computed(() => store.state.login.sms),
+        phone: computed(() => store.state.login.phone),
         second: 60,
         isSend: false,
         isLoading: false
@@ -402,7 +414,6 @@ export default defineComponent({
       const phoneRegEx = /^[1][3,4,5,6,7,8,9][0-9]{9}$/
       // 获取验证码
       const getSmsCode = async () => {
-        localStorage.removeItem('h5_sessionId')
         store.commit(`login/${Types.SAVE_PHONE}`, state.phone)
         if (!phoneRegEx.test(state.phone)) return Toast({
           message: '手机号输入有误！',
@@ -426,6 +437,10 @@ export default defineComponent({
       }
       // 登录
       const onLogin = () => {
+        if (!state.phone || !state.sms) return Toast({
+            message: '输入有误，请检查',
+            duration: 2000
+          })
         state.isLoading = true
         store.commit(`login/${Types.SAVE_SMS_CODE}`, state.sms)
         store.dispatch(`login/${Types.ON_LOGIN}`).then(res => {
